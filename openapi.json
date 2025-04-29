@@ -1,0 +1,585 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Backend",
+        "version": "0.1"
+    },
+
+    "paths": {
+        "/api/context": {
+            "get": {
+                "summary": "Получение контекста клиента",
+                "responses": {
+                    "200": {"$ref": "#/components/responses/Context"}
+                }
+            }
+        },
+
+        "/api/login": {
+            "post": {
+                "summary": "Авторизация",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["login", "password"],
+                                "properties": {
+                                    "login": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {"$ref": "#/components/responses/Context"}
+                }
+            }
+        },
+
+        "/api/logout": {
+            "post": {
+                "summary": "Выход",
+                "responses": {
+                    "401": {
+                        "description": "Пользователь разлогинен"
+                    }
+                }
+            }
+        },
+
+        "/api/grant/user/{userId}/{entityType}/{entityId}": {
+            "post": {
+                "summary": "Назначение прав доступа",
+                "parameters": [
+                    {
+                        "name": "userId",
+                        "in": "path",
+                        "schema": {"type": "integer"}
+                    },
+                    {"$ref": "#/components/parameters/entityType"},
+                    {"$ref": "#/components/parameters/entityId"}
+                ],
+                "requestBody": {
+                    "description": "Права доступа",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "create": {"type": "boolean"},
+                                    "read": {"type": "boolean"},
+                                    "update": {"type": "boolean"},
+                                    "delete": {"type": "boolean"},
+                                    "grant": {"type": "boolean"}
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/{entitiesType}": {
+            "get": {
+                "summary": "Получение списка сущностей",
+                "parameters": [
+                    {"$ref": "#/components/parameters/entitiesType"},
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "Параметры запроса",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "filter": {
+                                    "type": "object",
+                                    "description": "Фильтр сущностей (свойство: значение)"
+                                },
+                                "with": {
+                                    "type": "array",
+                                    "description": "Список связанных сущностей или счётчик связанных сущностей (название-count)",
+                                    "items": {"type": "string"}
+                                },
+                                "page": {
+                                    "type": "integer",
+                                    "description": "Номер страницы"
+                                },
+                                "pageSize": {
+                                    "type": "integer",
+                                    "description": "Количество сущностей на странице"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json":{
+                                "schema": {
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+
+            "post": {
+                "summary": "Создание сущности",
+                "parameters": [
+                    {"$ref": "#/components/parameters/entitiesType"}
+                ],
+                "requestBody": {
+                    "description": "Данные создаваемой сущности (см. Schemas)",
+                    "content": {
+                        "application/json": {
+                            "schema": {"type": "object"}
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "content": {
+                            "application/json": {
+                                "schema": {"type": "object"}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "/api/{entityType}/{entityId}": {
+            "delete": {
+                "summary": "Удаление сущности",
+                "parameters": [
+                    {"$ref": "#/components/parameters/entityType"},
+                    {"$ref": "#/components/parameters/entityId"}
+                ],
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {"type": "boolean"}
+                            }
+                        }
+                    }
+                }
+            },
+
+            "patch": {
+                "summary": "Изменение сущности",
+                "parameters": [
+                    {"$ref": "#/components/parameters/entityType"},
+                    {"$ref": "#/components/parameters/entityId"}
+                ],
+                "requestBody": {
+                    "description": "Данные обновляемой сущности (см. Schemas)",
+                    "content": {
+                        "application/json": {
+                            "schema": {"type": "object"}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {"type": "object"}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+
+    "components": {
+        "parameters": {
+            "entityId": {
+                "name": "entityId",
+                "in": "path",
+                "schema": {"type": "integer"}
+            },
+            "entitiesType": {
+                "name": "entitiesType",
+                "in": "path",
+                "schema": {
+                    "type": "string",
+                    "enum": [
+                        "authors",
+                        "books",
+                        "book_comments",
+                        "book_tags",
+                        "chapters",
+                        "genres",
+                        "team_comments",
+                        "teams",
+                        "users"
+                    ]
+                }
+            },
+            "entityType": {
+                "name": "entityType",
+                "in": "path",
+                "schema": {
+                    "type": "string",
+                    "enum": [
+                        "author",
+                        "book",
+                        "book_comment",
+                        "book_tag",
+                        "chapter",
+                        "genre",
+                        "team",
+                        "team_comment",
+                        "user"
+                    ]
+                }
+            }
+        },
+
+        "responses": {
+            "Context": {
+                "description": "Контекст клиента",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "context": {
+                                    "$ref": "#/components/schemas/Context"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+
+        "schemas": {
+            "Author": {
+                "allOf": [
+                    {"$ref": "#/components/schemas/Entity"},
+                    {"$ref": "#/components/schemas/Timestamps"},
+                    {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "required": true
+                            },
+                            "books": {
+                                "type": "array",
+                                "items": {"$ref": "#/components/schemas/Book"}
+                            }
+                        }
+                    }
+                ]
+            },
+
+            "Book": {
+                "allOf": [
+                    {"$ref": "#/components/schemas/Entity"},
+                    {"$ref": "#/components/schemas/Timestamps"},
+                    {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "required": true
+                            },
+                            "description": {
+                                "type": "string"
+                            },
+                            "year": {
+                                "type": "integer"
+                            },
+                            "status": {
+                                "type": "string",
+                                "enum": ["in_progress"]
+                            },
+                            "author": {"$ref": "#/components/schemas/Author"},
+                            "chapters": {
+                                "type": "array",
+                                "items": {"$ref": "#/components/schemas/Chapter"}
+                            },
+                            "comments": {
+                                "type": "array",
+                                "items": {"$ref": "#/components/schemas/BookComment"}
+                            },
+                            "genres": {
+                                "type": "array",
+                                "items": {"$ref": "#/components/schemas/Genre"}
+                            },
+                            "tags": {
+                                "type": "array",
+                                "items": {"$ref": "#/components/schemas/BookTag"}
+                            },
+                            "translator": {"$ref": "#/components/schemas/Translator"},
+                            "views": {
+                                "type": "array",
+                                "items": {"$ref": "#/components/schemas/BookView"}
+                            }
+                        }
+                    }
+                ]
+            },
+
+            "BookComment": {
+                "allOf": [
+                    {"$ref": "#/components/schemas/Entity"},
+                    {"$ref": "#/components/schemas/Timestamps"},
+                    {
+                        "type": "object",
+                        "required": ["content", "book"],
+                        "properties": {
+                            "content": {"type": "string"},
+                            "book": {"$ref": "#/components/schemas/Book"},
+                            "comments": {
+                                "type": "array",
+                                "items": {"$ref": "#/components/schemas/BookComment"}
+                            },
+                            "parent": {"$ref": "#/components/schemas/BookComment"},
+                            "user": {"$ref": "#/components/schemas/User"}
+                        }
+                    }
+                ]
+            },
+
+            "BookTag": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "name": {
+                        "type": "string",
+                        "required": true
+                    }
+                }
+            },
+
+            "BookTagFull": {
+                "allOf": [
+                    {"$ref": "#/components/schemas/BookTag"},
+                    {"$ref": "#/components/schemas/Timestamps"}
+                ]
+            },
+
+            "BookView": {
+                "type": "object",
+                "properties": {
+                    "book": {"$ref": "#/components/schemas/Book"},
+                    "user": {"$ref": "#/components/schemas/User"}
+                }
+            },
+
+            "Chapter": {
+                "allOf": [
+                    {"$ref": "#/components/schemas/Entity"},
+                    {
+                        "type": "object",
+                        "properties": {
+                            "content": {
+                                "type": "string",
+                                "required": true
+                            },
+                            "book": {"$ref": "#/components/schemas/Book"}
+                        }
+                    }
+                ]
+            },
+
+            "ChapterFull": {
+                "allOf": [
+                    {"$ref": "#/components/schemas/Chapter"},
+                    {"$ref": "#/components/schemas/Timestamps"},
+                    {
+                        "type": "object",
+                        "properties": {
+                            "user": {"$ref": "#/components/schemas/User"}
+                        }
+                    }
+                ]
+            },
+
+            "Context": {
+                "type": "object",
+                "properties": {
+                    "user": {
+                        "oneOf": [
+                            {"type": "null"},
+                            {"$ref": "#/components/schemas/User"}
+                        ]
+                    }
+                }
+            },
+
+            "Entity": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true
+                    }
+                }
+            },
+
+            "Genre": {
+                "allOf": [
+                    {"$ref": "#/components/schemas/Entity"},
+                    {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "required": true
+                            }
+                        }
+                    }
+                ]
+
+            },
+
+            "GenreFull": {
+                "allOf": [
+                    {"$ref": "#/components/schemas/Genre"},
+                    {"$ref": "#/components/schemas/Timestamps"}
+                ]
+            },
+
+            "Team": {
+                "allOf": [
+                    {"$ref": "#/components/schemas/Entity"},
+                    {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string",
+                                "required": true
+                            },
+                            "subscribers": {
+                                "type": "array",
+                                "items": {"$ref": "#/components/schemas/User"}
+                            },
+                            "teammates": {
+                                "type": "array",
+                                "items": {"$ref": "#/components/schemas/User"}
+                            }
+                        }
+                    }
+                ]
+            },
+
+            "TeamComment": {
+                "allOf": [
+                    {"$ref": "#/components/schemas/Entity"},
+                    {"$ref": "#/components/schemas/Timestamps"},
+                    {
+                        "type": "object",
+                        "properties": {
+                            "content": {
+                                "type": "string",
+                                "required": true
+                            },
+                            "comments": {
+                                "type": "array",
+                                "items": {"$ref": "#/components/schemas/TeamComment"}
+                            },
+                            "parent": {"$ref": "#/components/schemas/TeamComment"},
+                            "team": {"$ref": "#/components/schemas/Team"},
+                            "user": {"$ref": "#/components/schemas/User"}
+                        }
+                    }
+                ]
+            },
+
+            "TeamSubscriber": {
+                "allOf": [
+                    {"$ref": "#/components/schemas/User"}
+                ]
+            },
+
+            "TeamTeammate": {
+                "allOf": [
+                    {"$ref": "#/components/schemas/User"}
+                ]
+            },
+
+            "Timestamps": {
+                "type": "object",
+                "properties": {
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    }
+                }
+            },
+
+            "Translator": {
+                "allOf": [
+                    {"$ref": "#/components/schemas/User"}
+                ]
+            },
+
+            "User": {
+                "allOf": [
+                    {"$ref": "#/components/schemas/Entity"},
+                    {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ]
+            },
+
+            "UserFull": {
+                "allOf": [
+                    {"$ref": "#/components/schemas/User"},
+                    {"$ref": "#/components/schemas/Timestamps"},
+                    {
+                        "type": "object",
+                        "properties": {
+                            "email": {
+                                "type": "string"
+                            },
+                            "role": {
+                                "type": "string"
+
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}
