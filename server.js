@@ -6,7 +6,7 @@ import Context from './context.js'
 import DB from './db.js'
 import error from './error.js'
 import express from 'express'
-import openApi from './openapi.json' assert {type: 'json'}
+import openApi from './openapi.json' with { type: 'json' };
 import session from 'express-session'
 
 const app = express()
