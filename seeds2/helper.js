@@ -1,11 +1,8 @@
 export const ADMINS_COUNT = 2
 export const AUTHORS_COUNT = 30
+export const BOOK_TAGS_COUNT = 20
 export const BOOKS_COUNT = 100
-export const FANDOMS_COUNT = 20
-export const FAQ_COUNT = 10
 export const GENRES_COUNT = 20
-export const NEWS_COUNT = 30
-export const TAGS_COUNT = 20
 export const TEAMS_COUNT = 10
 export const USERS_COUNT = 50
 
@@ -17,16 +14,8 @@ export function randomAuthorId() {
   return random(1, AUTHORS_COUNT)
 }
 
-export function randomFandomId() {
-  return random(1, FANDOMS_COUNT)
-}
-
-export function randomGenreId() {
-  return random(1, GENRES_COUNT)
-}
-
-export function randomTagId() {
-  return random(1, TAGS_COUNT)
+export function randomBookTagId() {
+  return random(1, BOOK_TAGS_COUNT)
 }
 
 export function randomContent(part, maxCount) {
@@ -38,14 +27,8 @@ export function randomContent(part, maxCount) {
   return parts.join('. ')
 }
 
-export function randomDate(from, to) {
-  const min = (new Date(from)).getTime()
-  const max = (new Date(to)).getTime()
-
-  const date = new Date()
-  date.setTime(random(min, max))
-
-  return date
+export function randomGenreId() {
+  return random(1, GENRES_COUNT)
 }
 
 export function randomUserId() {
